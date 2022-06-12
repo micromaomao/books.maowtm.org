@@ -131,7 +131,7 @@ export class BookShelf extends Object3D {
     for (let b of books.reverse()) {
       this.add(b);
       b.position.setX(xx);
-      b.position.add(new Vector3(b.thickness / 2, b.height / 2, 0));
+      b.position.add(new Vector3(b.thickness / 2, b.height / 2, b.width / 2 - 0.7));
       xx += b.thickness + 0.007;
     }
   }

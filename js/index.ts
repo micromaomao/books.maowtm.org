@@ -84,7 +84,8 @@ class BooksApp {
   handleResize() {
     this.pixelWidth = window.innerWidth * window.devicePixelRatio;
     this.pixelHeight = window.innerHeight * window.devicePixelRatio;
-    this.renderer.setSize(this.pixelWidth, this.pixelHeight);
+    // Don't update style, because canvas should always be 100vw/vh
+    this.renderer.setSize(this.pixelWidth, this.pixelHeight, false);
     this.camera.aspect = this.pixelWidth / this.pixelHeight;
     this.camera.updateProjectionMatrix();
     this.ssao_pass.width = this.pixelWidth;
