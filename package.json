@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "description": "",
-  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "serve": "parcel serve index.html --open",
@@ -25,7 +24,9 @@
   "homepage": "https://github.com/micromaomao/books.maowtm.org#readme",
   "devDependencies": {
     "@types/three": "^0.141.0",
-    "parcel": "^2.6.0",
+    "parcel": "^2.6.0"
+  },
+  "dependencies": {
     "three": "^0.141.0"
   }
 }
