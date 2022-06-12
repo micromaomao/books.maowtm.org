@@ -6,6 +6,8 @@ const bookglb: string = require("url:../models/book.gltf");
 const loader = new GLTFLoader();
 let bookModel: GLTF | null = null;
 
+const EDGE_CUTOFF = 0.13;
+
 export class BookObject extends THREE.Object3D {
   constructor() {
     if (bookModel === null) {
@@ -13,6 +15,7 @@ export class BookObject extends THREE.Object3D {
     }
     super();
     let cloned = bookModel.scene.clone(true);
+    let scale_factor = 0.2;
     cloned.traverse(child => {
       if (child instanceof Mesh) {
         let geom = child.geometry;
@@ -20,11 +23,20 @@ export class BookObject extends THREE.Object3D {
         let posarr = geom.attributes.position;
         for (let i = 0; i < posarr.count; i ++) {
           let x = posarr.array[i*3];
-          if (x < -0.1) {
-            x -= -0.07;
+          if (Math.abs(x) < EDGE_CUTOFF) {
+            x *= scale_factor;
+          } else {
+            if (x < 0) {
+              x += EDGE_CUTOFF * (1 - scale_factor);
+            } else {
+              x -= EDGE_CUTOFF * (1 - scale_factor);
+            }
           }
-          if (x > 0.1) {
-            x += -0.07;
+          if (x < -EDGE_CUTOFF) {
+            // TODO
+          }
+          if (x > EDGE_CUTOFF) {
+            // TODO
           }
           posarr.array[i*3] = x;
         }
