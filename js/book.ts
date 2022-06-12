@@ -13,6 +13,7 @@ const EDGE_CUTOFF_X = 0.145;
 
 const testImg = textureLoader.load(require("url:../books/img/haruhi-1.png"));
 testImg.flipY = false;
+testImg.anisotropy = 2;
 
 export class BookObject extends THREE.Object3D {
   constructor() {
