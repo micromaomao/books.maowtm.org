@@ -32,7 +32,7 @@ class BooksApp {
       canvas: this.canvas,
     });
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(this.fov, 1, 1, 1000);
+    this.camera = new THREE.PerspectiveCamera(this.fov, 1, 0.001, 1000);
     this.scene.add(this.camera);
     this.handleResize();
     window.addEventListener("resize", this.handleResize.bind(this));
