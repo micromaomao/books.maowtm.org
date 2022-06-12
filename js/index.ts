@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import { FlyControls } from 'three/examples/jsm/controls/FlyControls'
+import { FlyControls } from 'three/examples/jsm/controls/FlyControls';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { BookObject, ready as book_ready } from './book';
 
 const dom_ready = new Promise((resolve) => {
@@ -24,7 +25,7 @@ class BooksApp {
 
   fov = 75;
 
-  debug_controls: FlyControls | null;
+  debug_controls: OrbitControls | null;
 
   constructor(canvasElem: HTMLCanvasElement) {
     this.canvas = canvasElem;
@@ -32,12 +33,13 @@ class BooksApp {
       canvas: this.canvas,
     });
     this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color(0xaaaaaa);
     this.camera = new THREE.PerspectiveCamera(this.fov, 1, 0.001, 1000);
     this.scene.add(this.camera);
     this.handleResize();
     window.addEventListener("resize", this.handleResize.bind(this));
 
-    let ambient = new THREE.AmbientLight(0xaaaaaa, 1);
+    let ambient = new THREE.AmbientLight(0xffffff, 1);
     this.scene.add(ambient);
 
     let testBook = new BookObject();
@@ -46,10 +48,8 @@ class BooksApp {
     this.camera.position.set(0, 0, 3);
     this.camera.lookAt(testBook.position);
 
-    this.debug_controls = new FlyControls(this.camera, this.canvas);
-    this.debug_controls.dragToLook = true;
-    this.debug_controls.rollSpeed = 0.4;
-    this.debug_controls.movementSpeed = 3;
+    this.debug_controls = new OrbitControls(this.camera, this.canvas);
+    this.debug_controls.update();
 
     this.last_time = Date.now() - 1;
     this.render();
@@ -69,7 +69,7 @@ class BooksApp {
     this.last_time = now;
 
     if (this.debug_controls) {
-      this.debug_controls.update(delta);
+      this.debug_controls.update();
     }
 
     this.threeRenderer.render(this.scene, this.camera);
