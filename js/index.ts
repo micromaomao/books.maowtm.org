@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { Vector3 } from 'three';
 import { FlyControls } from 'three/examples/jsm/controls/FlyControls';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { BookObject, ready as book_ready } from './book';
@@ -42,11 +43,16 @@ class BooksApp {
     let ambient = new THREE.AmbientLight(0xffffff, 1);
     this.scene.add(ambient);
 
-    let testBook = new BookObject();
-    this.scene.add(testBook);
+    let xx = 0;
+    for (let i = 0; i < 100; i ++) {
+      let testBook = new BookObject(require("url:../books/img/haruhi-1.png"), 0.5, 1, 1);
+      testBook.position.setX(xx);
+      xx += testBook.thickness + 0.002;
+      this.scene.add(testBook);
+    }
 
     this.camera.position.set(0, 0, 3);
-    this.camera.lookAt(testBook.position);
+    this.camera.lookAt(new Vector3(0, 0, 0));
 
     this.debug_controls = new OrbitControls(this.camera, this.canvas);
     this.debug_controls.update();
