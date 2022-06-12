@@ -1,0 +1,31 @@
+{
+  "name": "books.maowtm.org",
+  "version": "1.0.0",
+  "private": true,
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "parcel serve index.html --open",
+    "build": "parcel build index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/micromaomao/books.maowtm.org.git"
+  },
+  "author": {
+    "name": "Tingmao Wang",
+    "email": "m@maowtm.org",
+    "url": "https://maowtm.org"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/micromaomao/books.maowtm.org/issues"
+  },
+  "homepage": "https://github.com/micromaomao/books.maowtm.org#readme",
+  "devDependencies": {
+    "@types/three": "^0.141.0",
+    "parcel": "^2.6.0",
+    "three": "^0.141.0"
+  }
+}
