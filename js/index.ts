@@ -1,8 +1,10 @@
 import * as THREE from 'three';
-import { Vector3 } from 'three';
-import { FlyControls } from 'three/examples/jsm/controls/FlyControls';
+import { DirectionalLightShadow, Vector3 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { BookObject, ready as book_ready } from './book';
+import { BookObject, BookShelf, ready as book_ready } from './book';
+import { getBookList } from "../books/booklist";
+import { SSAOPass } from "three/examples/jsm/postprocessing/SSAOPass";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
 
 const dom_ready = new Promise((resolve) => {
   document.addEventListener("DOMContentLoaded", evt => {
@@ -19,43 +21,61 @@ class BooksApp {
   canvas: HTMLCanvasElement;
   pixelWidth: number;
   pixelHeight: number;
-  threeRenderer: THREE.WebGLRenderer;
+  renderer: THREE.WebGLRenderer;
   scene: THREE.Scene;
   camera: THREE.PerspectiveCamera;
   last_time: number;
+  composer: EffectComposer;
+  ssao_pass: SSAOPass;
 
   fov = 75;
 
   debug_controls: OrbitControls | null;
 
   constructor(canvasElem: HTMLCanvasElement) {
+    this.pixelWidth = window.innerWidth * window.devicePixelRatio;
+    this.pixelHeight = window.innerHeight * window.devicePixelRatio;
     this.canvas = canvasElem;
-    this.threeRenderer = new THREE.WebGLRenderer({
+    this.canvas.width = this.pixelWidth;
+    this.canvas.height = this.pixelHeight;
+    this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
     });
+    this.renderer.shadowMap.enabled = true;
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0xaaaaaa);
     this.camera = new THREE.PerspectiveCamera(this.fov, 1, 0.001, 1000);
     this.scene.add(this.camera);
+    this.composer = new EffectComposer(this.renderer);
+    this.ssao_pass = new SSAOPass(this.scene, this.camera, this.pixelWidth, this.pixelHeight);
+    this.ssao_pass.kernelRadius = 16;
+    this.ssao_pass.minDistance = 0.003;
+    this.ssao_pass.maxDistance = 0.2;
+    this.composer.addPass(this.ssao_pass);
+
     this.handleResize();
     window.addEventListener("resize", this.handleResize.bind(this));
 
-    let ambient = new THREE.AmbientLight(0xffffff, 1);
+    let ambient = new THREE.AmbientLight(0xffffff, 0.8);
     this.scene.add(ambient);
 
-    let xx = 0;
-    for (let i = 0; i < 100; i ++) {
-      let testBook = new BookObject(require("url:../books/img/haruhi-1.png"), 0.5, 1, 1);
-      testBook.position.setX(xx);
-      xx += testBook.thickness + 0.002;
-      this.scene.add(testBook);
-    }
+    let bs = new BookShelf(getBookList()["Haruhi Suzumiya"]);
+    this.scene.add(bs);
 
-    this.camera.position.set(0, 0, 3);
-    this.camera.lookAt(new Vector3(0, 0, 0));
+    let dir = new THREE.DirectionalLight(0xffffff, 0.5);
+    dir.castShadow = true;
+    dir.position.set(0, 5, 3);
+    this.scene.add(dir);
+
+    this.camera.position.set(1, 1, 3);
+    this.camera.lookAt(new Vector3(1, 1, 0));
 
     this.debug_controls = new OrbitControls(this.camera, this.canvas);
+    this.debug_controls.target = new Vector3(1, 1, 0);
     this.debug_controls.update();
+
+    // this.scene.add(new THREE.DirectionalLightHelper(dir, 0.8));
+    // this.scene.add(new THREE.CameraHelper(dir.shadow.camera));
 
     this.last_time = Date.now() - 1;
     this.render();
@@ -64,9 +84,11 @@ class BooksApp {
   handleResize() {
     this.pixelWidth = window.innerWidth * window.devicePixelRatio;
     this.pixelHeight = window.innerHeight * window.devicePixelRatio;
-    this.threeRenderer.setSize(this.pixelWidth, this.pixelHeight);
+    this.renderer.setSize(this.pixelWidth, this.pixelHeight);
     this.camera.aspect = this.pixelWidth / this.pixelHeight;
     this.camera.updateProjectionMatrix();
+    this.ssao_pass.width = this.pixelWidth;
+    (this.ssao_pass as any).height = this.pixelHeight; // TODO: fix
   }
 
   render() {
@@ -78,7 +100,7 @@ class BooksApp {
       this.debug_controls.update();
     }
 
-    this.threeRenderer.render(this.scene, this.camera);
+    this.composer.render(delta);
   }
 }
 

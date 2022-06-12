@@ -1,11 +1,13 @@
 import * as THREE from 'three';
-import { Mesh, MeshStandardMaterial, Texture, TextureLoader } from 'three';
+import { Mesh, MeshStandardMaterial, Object3D, Texture, TextureLoader, Vector3 } from 'three';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 const bookglb: string = require("url:../models/book.gltf");
+const bookshelfglb: string = require("url:../models/bookshelf.gltf");
 const meshLoader = new GLTFLoader();
 const textureLoader = new TextureLoader();
 let bookModel: GLTF | null = null;
+let bookshelfModel: GLTF | null = null;
 let paperMaterial: MeshStandardMaterial | null = null;
 
 const MESHNAME_BOOK = "book";
@@ -16,7 +18,18 @@ const EDGE_CUTOFF_X = 0.088;
 export class BookObject extends THREE.Object3D {
   imgPromise: Promise<Texture>;
   bookObject: Mesh | null;
+  /**
+   * x length
+   */
   thickness: number = 0;
+  /**
+   * z length
+   */
+  width: number = 0;
+  /**
+   * y length
+   */
+  height: number = 0;
   constructor(imgUrl, xscale, yscale, zscale) {
     super();
     if (bookModel === null) {
@@ -27,6 +40,8 @@ export class BookObject extends THREE.Object3D {
     });
     let cloned = bookModel.scene.clone(true);
     cloned.traverse(child => {
+      // child.castShadow = true;
+      child.receiveShadow = true;
       if (child.name === MESHNAME_BOOK || child.name === MESHNAME_PAPER) {
         let mchild = child as Mesh;
         mchild.geometry = mchild.geometry.clone();
@@ -81,7 +96,44 @@ export class BookObject extends THREE.Object3D {
       mat.needsUpdate = true;
     });
 
-    console.log(this.thickness);
+    this.height = 1.5 * zscale;
+    this.width = yscale;
+  }
+}
+
+export class BookShelf extends Object3D {
+  books: BookObject[] = [];
+
+  static generateColor(): number {
+    let r = Math.floor(Math.random() * (256 - 70)) + 70;
+    let g = Math.floor(Math.random() * (256 - 70)) + 70;
+    let b = Math.floor(Math.random() * (256 - 70)) + 70;
+    return r << 16 | g << 8 | b;
+  }
+
+  constructor(books: BookObject[]) {
+    super();
+    this.books = books;
+    if (bookshelfModel === null) {
+      throw new Error("await book.ready first.");
+    }
+    let cloned = bookshelfModel.scene.clone(true);
+    let bs = cloned.children[0] as Mesh;
+    bs.material = new THREE.MeshStandardMaterial({
+      color: BookShelf.generateColor(),
+      roughness: 0.9,
+    });
+    bs.castShadow = true;
+    bs.receiveShadow = true;
+    this.add(bs);
+
+    let xx = 0;
+    for (let b of books.reverse()) {
+      this.add(b);
+      b.position.setX(xx);
+      b.position.add(new Vector3(b.thickness / 2, b.height / 2, 0));
+      xx += b.thickness + 0.007;
+    }
   }
 }
 
@@ -91,6 +143,15 @@ const loadMesh = new Promise((resolve, reject) => {
     resolve(null);
   }, undefined, err => {
     reject(new Error(`Failed to load book.glb: ${err}`));
+  });
+});
+
+const loadBookshelf = new Promise((resolve, reject) => {
+  meshLoader.load(bookshelfglb, gltf => {
+    bookshelfModel = gltf;
+    resolve(null);
+  }, undefined, err => {
+    reject(new Error(`Failed to load bookshelf.glb: ${err}`));
   });
 });
 
@@ -107,4 +168,4 @@ const loadPaperMaterial = new Promise((resolve, reject) => {
   });
 })
 
-export const ready = Promise.all([loadMesh, loadPaperMaterial]);
+export const ready = Promise.all([loadMesh, loadPaperMaterial, loadBookshelf]);
