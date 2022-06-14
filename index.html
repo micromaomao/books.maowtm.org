@@ -40,7 +40,7 @@
       align-items: center;
     }
     .bookdetails.show {
-      transform: translateX(0);
+      transform: translate(0, 0);
       pointer-events: initial;
     }
     .bookdetails.mobile-layout {
@@ -50,6 +50,10 @@
       height: 45%;
       top: auto;
       width: auto;
+      transform: translateY(50vh);
+    }
+    .bookdetails.mobile-layout.show {
+      transform: translate(0, 0);
     }
 
     .bookdetails h2 {

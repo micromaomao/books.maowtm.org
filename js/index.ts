@@ -289,7 +289,9 @@ class BooksApp {
   }
 
   handleUp(evt: Event) {
-    evt.preventDefault();
+    if (evt.target === this.canvas) {
+      evt.preventDefault();
+    }
     this.rotating_book = false;
     this.dragging_camera = false;
     if (this.debug_controls) {
