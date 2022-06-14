@@ -66,8 +66,10 @@ class BooksApp {
     this.camera = new THREE.PerspectiveCamera(this.fov, 1, 0.001, 1000);
     this.scene.add(this.camera);
 
-    this.handleResize();
     window.addEventListener("resize", this.handleResize.bind(this));
+    this.handleResize();
+
+    setInterval(() => this.handleResize(), 1000); // Weird chrome bug
 
     let ambient = new THREE.AmbientLight(0xffffff, 0.7);
     this.scene.add(ambient);
