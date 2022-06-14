@@ -185,11 +185,11 @@ class BooksApp {
     }
     let x: number, y: number;
     if (evt instanceof MouseEvent) {
-      x = evt.clientX / this.pixelWidth * 2 - 1;
-      y = -(evt.clientY / this.pixelHeight * 2 - 1);
+      x = evt.pageX / this.pixelWidth * 2 - 1;
+      y = -(evt.pageY / this.pixelHeight * 2 - 1);
     } else if (evt.touches.length === 1) {
-      x = evt.touches[0].clientX / this.pixelWidth * 2 - 1;
-      y = -(evt.touches[0].clientY / this.pixelHeight * 2 - 1);
+      x = evt.touches[0].pageX / this.pixelWidth * 2 - 1;
+      y = -(evt.touches[0].pageY / this.pixelHeight * 2 - 1);
     } else {
       return null;
     }
