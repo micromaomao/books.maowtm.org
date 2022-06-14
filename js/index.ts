@@ -85,6 +85,7 @@ class BooksApp {
     this.updateHandlers.push(f.update.bind(f));
 
     let bs = new BookRow(getBookList()["Haruhi Suzumiya"]);
+    bs.position.setY(0.02);
     this.scene.add(bs);
     this.updateHandlers.push(bs.update.bind(bs));
 
@@ -146,6 +147,9 @@ class BooksApp {
 
   render() {
     let delta = this.clock.getDelta();
+    if (delta > 0.3) {
+      delta = 0.3;
+    }
 
     if (this.debug_controls) {
       this.debug_controls.update();

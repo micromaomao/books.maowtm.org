@@ -134,9 +134,6 @@ export class BookObject extends THREE.Object3D {
   }
 
   update(delta: number) {
-    if (delta > 0.3) {
-      delta = 0.3;
-    }
     if (this.transformFn) {
       if (this.transformingBack) {
         this.transformFrontTime -= delta * TRANSFORM_SPEED;
