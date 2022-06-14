@@ -39,6 +39,9 @@ class BooksApp {
   lastMouseX: number = 0;
   lastMouseY: number = 0;
 
+  cameraTargetPos: Vector3;
+  dragging_camera: boolean = false;
+
   constructor(canvasElem: HTMLCanvasElement) {
     this.pixelWidth = window.innerWidth;
     this.pixelHeight = window.innerHeight;
@@ -76,8 +79,9 @@ class BooksApp {
     this.scene.add(bs);
     this.updateHandlers.push(bs.update.bind(bs));
 
-    this.camera.position.set(1, 0.5, 3.5);
-    this.camera.lookAt(new Vector3(1, 0.5, 0));
+    this.cameraTargetPos = new Vector3(1, 2, 3);
+    this.camera.position.copy(this.cameraTargetPos);
+    this.camera.lookAt(new Vector3(1, -0, 0));
 
     // this.debug_controls = new OrbitControls(this.camera, this.canvas);
     // this.debug_controls.target = new Vector3(1, 0.5, 0);
@@ -126,12 +130,18 @@ class BooksApp {
       this.currently_viewing.overlayRotation.premultiply(new Quaternion().setFromEuler(new Euler(0, delta * Math.PI / 180 * 20, 0, "XYZ")));
     }
 
+    let targetCamPos = this.cameraTargetPos.clone();
+    if (this.currently_viewing) {
+      targetCamPos.add(new Vector3(0, 0.5, 0.8));
+    }
+    this.camera.position.lerp(targetCamPos, 10 * delta);
+
     // this.composer.render(delta);
     this.renderer.render(this.scene, this.camera);
   }
 
   raycastBooks(x: number, y: number): BookObject | null {
-    this.raycaster.setFromCamera({x, y}, this.camera);
+    this.raycaster.setFromCamera({ x, y }, this.camera);
     let res = this.raycaster.intersectObjects(allBookHitboxes, false);
     if (res.length > 0) {
       let obj = res[0].object;
@@ -154,7 +164,7 @@ class BooksApp {
     } else {
       return null;
     }
-    return {x, y};
+    return { x, y };
   }
 
   handleMove(evt: MouseEvent | TouchEvent) {
@@ -162,7 +172,7 @@ class BooksApp {
     if (!coords) {
       return;
     }
-    let {x, y} = coords;
+    let { x, y } = coords;
     this.canvas.style.cursor = "auto";
     let deltaX = x - this.lastMouseX;
     let deltaY = y - this.lastMouseY;
@@ -177,6 +187,23 @@ class BooksApp {
         rot.z += deltaY * factor;
         this.currently_viewing.overlayRotation.premultiply(new Quaternion().setFromEuler(rot));
       }
+      return;
+    }
+    if (this.dragging_camera) {
+      this.cameraTargetPos.add(new Vector3(deltaX, deltaY, 0).multiplyScalar(-3));
+      if (this.cameraTargetPos.y > 2.5) {
+        this.cameraTargetPos.setY(2.5);
+      }
+      if (this.cameraTargetPos.y < -3) {
+        this.cameraTargetPos.setY(-3);
+      }
+      if (this.cameraTargetPos.x > 10) {
+        this.cameraTargetPos.setX(10);
+      }
+      if (this.cameraTargetPos.x < -1) {
+        this.cameraTargetPos.setX(-1);
+      }
+      return;
     }
 
     if (this.currently_viewing) {
@@ -198,7 +225,7 @@ class BooksApp {
     if (!coords) {
       return;
     }
-    let {x, y} = coords;
+    let { x, y } = coords;
     this.lastMouseX = x;
     this.lastMouseY = y;
 
@@ -217,11 +244,14 @@ class BooksApp {
     let b = this.raycastBooks(x, y);
     if (b) {
       this.viewBook(b);
+    } else {
+      this.dragging_camera = true;
     }
   }
 
   handleUp() {
     this.rotating_book = false;
+    this.dragging_camera = false;
     if (this.debug_controls) {
       this.debug_controls.enabled = true;
     }
@@ -235,8 +265,10 @@ class BooksApp {
       this.clearCurrentlyViewing();
     }
     this.currently_viewing = book;
-    let campos = this.camera.position;
-    book.transformToFront(new Vector3(campos.x - (this.pixelWidth / this.pixelHeight) * 0.7, campos.y + 0.2, 1.4), new Euler(0, -Math.PI / 2, 0));
+    let campos = this.cameraTargetPos;
+    book.transformToFront(
+      new Vector3(campos.x - (this.pixelWidth / this.pixelHeight) * 0.7, campos.y - 0.5, 2.2),
+      new Euler(-Math.PI * 20 / 180, -Math.PI / 2, 0));
   }
 
   clearCurrentlyViewing() {
