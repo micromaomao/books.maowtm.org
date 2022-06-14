@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Mesh, MeshStandardMaterial, Object3D, Texture, TextureLoader, Vector3 } from 'three';
+import { BoxGeometry, Euler, Matrix4, Mesh, MeshStandardMaterial, Object3D, Quaternion, Texture, TextureLoader, Vector3 } from 'three';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { loadModel } from "./utils"
 
@@ -11,9 +11,29 @@ const MESHNAME_BOOK = "book";
 const MESHNAME_PAPER = "paper";
 const EDGE_CUTOFF_X = 0.088;
 
+const HITBOX_YMARGIN = 0.03;
+const RAISE = 0.1;
+
+const TRANSFORM_SPEED = 3;
+
+const hitboxMaterial = new THREE.SpriteMaterial({
+  visible: false
+});
+
+export const allBookHitboxes: BookHitbox[] = [];
+
+export class BookHitbox extends THREE.Mesh {
+  book: BookObject;
+  constructor(book: BookObject) {
+    super(new BoxGeometry(book.thickness, book.height + HITBOX_YMARGIN, book.width), hitboxMaterial);
+    this.book = book;
+    this.position.setY(HITBOX_YMARGIN / 2);
+  }
+}
 
 export class BookObject extends THREE.Object3D {
   imgPromise: Promise<Texture>;
+  bookMesh: Object3D;
   bookObject: Mesh | null;
   /**
    * x length
@@ -27,6 +47,14 @@ export class BookObject extends THREE.Object3D {
    * y length
    */
   height: number = 0;
+  hitbox: BookHitbox;
+  hovered: boolean = false;
+
+  savedTransformMatrix: Matrix4 | null = null;
+  transformFn: ((p: number) => void) | null = null;
+  transformFrontTime: number = 0;
+  transformingBack: boolean = false;
+  overlayRotation: Quaternion = new Quaternion().identity();
   constructor(imgUrl, xscale, yscale, zscale) {
     super();
     if (bookModel === null) {
@@ -35,8 +63,8 @@ export class BookObject extends THREE.Object3D {
     this.imgPromise = new Promise((resolve, reject) => {
       textureLoader.load(imgUrl, resolve, undefined, reject);
     });
-    let cloned = bookModel.scene.clone(true);
-    cloned.traverse(child => {
+    this.bookMesh = bookModel.scene.clone(true);
+    this.bookMesh.traverse(child => {
       if (child.name === MESHNAME_BOOK || child.name === MESHNAME_PAPER) {
         let mchild = child as Mesh;
         mchild.geometry = mchild.geometry.clone();
@@ -76,7 +104,7 @@ export class BookObject extends THREE.Object3D {
         }
       }
     });
-    this.add(cloned);
+    this.add(this.bookMesh);
     this.imgPromise.then(tex => {
       let mat = this.bookObject!.material as THREE.MeshStandardMaterial;
       tex.flipY = false;
@@ -93,6 +121,105 @@ export class BookObject extends THREE.Object3D {
 
     this.height = 1.5 * zscale;
     this.width = yscale;
+
+    this.hitbox = new BookHitbox(this);
+    this.add(this.hitbox);
+    allBookHitboxes.push(this.hitbox);
+  }
+
+  update(delta: number) {
+    if (delta > 0.3) {
+      delta = 0.3;
+    }
+    if (this.transformFn) {
+      if (this.transformingBack) {
+        this.transformFrontTime -= delta * TRANSFORM_SPEED;
+        if (this.transformFrontTime <= 0) {
+          this.bookMesh.matrixAutoUpdate = false;
+          this.bookMesh.matrix = this.savedTransformMatrix!;
+          this.savedTransformMatrix = null;
+          this.transformFn = null;
+          this.transformFrontTime = 0;
+          this.transformingBack = false;
+          this.bookMesh.updateMatrixWorld();
+          this.bookMesh.matrixAutoUpdate = true;
+        }
+      } else {
+        this.transformFrontTime += delta * TRANSFORM_SPEED;
+        if (this.transformFrontTime > 1) {
+          this.transformFrontTime = 1;
+        }
+      }
+      if (this.transformFn) {
+        this.transformFn(this.transformFrontTime);
+      }
+      return;
+    }
+    let mesh_y = this.bookMesh.position.y;
+    let diff = (this.hovered ? RAISE : 0) - mesh_y;
+    if (Math.abs(diff) > 0.1) {
+      diff = Math.sign(diff) * 0.1;
+    }
+    if (Math.abs(diff) > 0.001 && Math.abs(diff) < 0.02) {
+      diff = Math.sign(diff) * 0.02;
+    }
+    mesh_y += delta * 15 * diff;
+    this.bookMesh.position.setY(mesh_y);
+  }
+
+  transformToFront(targetPos: Vector3, targetRot: Euler) {
+    if (this.savedTransformMatrix) {
+      this.bookMesh.matrixAutoUpdate = false;
+      this.bookMesh.matrix.copy(this.savedTransformMatrix);
+      this.bookMesh.updateMatrixWorld();
+      this.savedTransformMatrix = null;
+      this.transformFn = null;
+    }
+    this.bookMesh.updateMatrix();
+    this.savedTransformMatrix = this.bookMesh.matrix.clone();
+    let curr_pos = new Vector3();
+    let curr_rot = new Quaternion();
+    let curr_scale = new Vector3();
+    this.savedTransformMatrix.decompose(curr_pos, curr_rot, curr_scale);
+
+    this.bookMesh.matrixAutoUpdate = false;
+    this.bookMesh.matrix.identity();
+    this.bookMesh.updateMatrixWorld();
+    let m_world = this.bookMesh.matrixWorld;
+    if (m_world.determinant() === 0) {
+      throw new Error("unreachable");
+    }
+    let target_trans = m_world.invert();
+    target_trans.multiply(new Matrix4().compose(targetPos, new Quaternion().setFromEuler(targetRot), curr_scale));
+    let target_pos = new Vector3();
+    let target_rot = new Quaternion();
+    target_trans.decompose(target_pos, target_rot, new Vector3());
+    this.bookMesh.matrix.copy(this.savedTransformMatrix);
+    this.bookMesh.updateMatrixWorld();
+
+    this.overlayRotation.identity();
+
+    this.transformFn = (p => {
+      let lerp_pos = new Vector3().lerpVectors(curr_pos, target_pos, 1 - Math.pow((1 - p), 3));
+      let lerp_rot = new Quaternion().slerpQuaternions(curr_rot, target_rot, Math.pow(p, 4));
+      let mat = new Matrix4().compose(lerp_pos, lerp_rot, curr_scale);
+      mat.multiply(new Matrix4().makeRotationFromQuaternion(
+        new Quaternion().identity().slerp(this.overlayRotation, Math.pow(p, 2))
+      ));
+      this.bookMesh.matrix.copy(mat);
+      this.bookMesh.updateMatrixWorld();
+    });
+    this.transformFrontTime = 0;
+  }
+
+  transformBack() {
+    if (!this.savedTransformMatrix) {
+      return;
+    }
+    if (this.transformFrontTime > 1) {
+      this.transformFrontTime = 1;
+    }
+    this.transformingBack = true;
   }
 }
 
@@ -129,6 +256,12 @@ export class BookRow extends Object3D {
     for (let book of books) {
       let zoff = (Math.random() - 0.3) * 0.05;
       book.position.add(new Vector3(0, 0, zoff));
+    }
+  }
+
+  update(delta: number) {
+    for (let b of this.books) {
+      b.update(delta);
     }
   }
 }
