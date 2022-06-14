@@ -33,6 +33,7 @@ export class BookHitbox extends THREE.Mesh {
 
 export class BookObject extends THREE.Object3D {
   imgPromise: Promise<Texture>;
+  metadata: BookMetadata;
   bookMesh: Object3D;
   bookObject: Mesh | null;
   /**
@@ -55,8 +56,13 @@ export class BookObject extends THREE.Object3D {
   transformFrontTime: number = 0;
   transformingBack: boolean = false;
   overlayRotation: Quaternion = new Quaternion().identity();
-  constructor(imgUrl, xscale, yscale, zscale) {
+
+  next: BookObject | null = null;
+  prev: BookObject | null = null;
+
+  constructor(imgUrl: string, xscale: number, yscale: number, zscale: number, metadata: BookMetadata) {
     super();
+    this.metadata = metadata;
     if (bookModel === null) {
       throw new Error("await book.ready first.");
     }
@@ -230,8 +236,16 @@ export class BookRow extends Object3D {
     super();
     this.books = books;
 
+    for (let i = 0; i < books.length; i ++) {
+      if (i > 0) {
+        books[i].prev = books[i - 1];
+      }
+      if (i < books.length - 1) {
+        books[i].next = books[i + 1];
+      }
+    }
+
     let xx = 0;
-    books.reverse();
     for (let b of books) {
       this.add(b);
       b.position.setX(xx);
@@ -283,3 +297,11 @@ export const ready = Promise.all([
   loadModel(require("url:../models/book.gltf")).then(x => bookModel = x),
   loadPaperMaterial
 ]);
+
+export interface BookMetadata {
+  title: string,
+  author: string,
+  url: string,
+  series: string | undefined,
+  description?: string | undefined,
+}

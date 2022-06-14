@@ -9,6 +9,7 @@
   <style>
     body {
       overflow: hidden;
+      font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     }
     #scene {
       position: absolute;
@@ -17,6 +18,91 @@
       width: 100vw;
       height: 100vh;
     }
+    .bookdetails {
+      position: absolute;
+      right: 10%;
+      top: 15%;
+      bottom: 15%;
+      width: 40%;
+      background-color: rgba(0, 0, 0, 0.692);
+      color: white;
+      will-change: transform;
+      pointer-events: none;
+      transform: translateX(150%);
+      transition: transform 300ms ease-in-out;
+      padding: 15px;
+      overflow: auto;
+      text-align: center;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      flex-wrap: nowrap;
+      justify-content: center;
+      align-items: center;
+    }
+    .bookdetails.show {
+      transform: translateX(0);
+      pointer-events: initial;
+    }
+    .bookdetails.mobile-layout {
+      left: 5%;
+      right: 5%;
+      bottom: 5%;
+      height: 45%;
+      top: auto;
+      width: auto;
+    }
+
+    .bookdetails h2 {
+      margin: 5px auto;
+      font-size: 40px;
+      font-weight: normal;
+    }
+
+    .bookdetails #book-author {
+      font-size: 120%;
+      margin-top: 5px;
+    }
+
+    .bookdetails .closebtn {
+      cursor: pointer;
+      display: inline-block;
+      padding: 10px;
+      margin-top: auto;
+    }
+
+    .bookdetails .navbtns {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-content: space-between;
+      align-items: baseline;
+      width: 100%;
+    }
+
+    .bookdetails .navbtns > span {
+      cursor: pointer;
+      display: inline-block;
+      font-size: 110%;
+      padding: 8px;
+    }
+
+    .bookdetails .navbtns > span.disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    .bookdetails #book-desc {
+      text-align: justify;
+      hyphens: auto;
+      max-width: 100%;
+      margin: 10px;
+    }
+
+    .bookdetails a {
+      text-decoration: underline;
+      color: inherit;
+    }
   </style>
 </head>
 <body>
@@ -24,5 +110,17 @@
     This page requires JavaScript to work.
   </noscript>
   <canvas id="scene"></canvas>
+  <div class="bookdetails">
+    <div class="navbtns">
+      <span class="prev">&lt; Previous</span>
+      <span class="next">Next &gt;</span>
+    </div>
+    <div id="book-series"></div>
+    <h2 id="book-title"></h2>
+    <div id="book-author"></div>
+    <div id="book-desc"></div>
+
+    <div class="closebtn">&times; Close</div>
+  </div>
 </body>
 </html>

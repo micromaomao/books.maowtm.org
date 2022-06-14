@@ -20,6 +20,12 @@ const loading_promise = Promise.all([
 
 class BooksApp {
   canvas: HTMLCanvasElement;
+  book_details: HTMLElement;
+
+  get mobile_layout() {
+    return this.pixelWidth < this.pixelHeight;
+  }
+
   pixelWidth: number;
   pixelHeight: number;
   renderer: THREE.WebGLRenderer;
@@ -42,10 +48,11 @@ class BooksApp {
   cameraTargetPos: Vector3;
   dragging_camera: boolean = false;
 
-  constructor(canvasElem: HTMLCanvasElement) {
+  constructor(canvasElem: HTMLCanvasElement, book_details_elem: HTMLElement) {
     this.pixelWidth = window.innerWidth;
     this.pixelHeight = window.innerHeight;
     this.canvas = canvasElem;
+    this.book_details = book_details_elem;
     this.canvas.width = this.pixelWidth;
     this.canvas.height = this.pixelHeight;
     this.renderer = new THREE.WebGLRenderer({
@@ -96,13 +103,27 @@ class BooksApp {
     this.render();
 
     this.raycaster = new Raycaster();
-    this.canvas.addEventListener("mousemove", this.handleMove.bind(this));
-    this.canvas.addEventListener("touchmove", this.handleMove.bind(this))
+    window.addEventListener("mousemove", this.handleMove.bind(this));
+    window.addEventListener("touchmove", this.handleMove.bind(this))
     this.canvas.addEventListener("mousedown", this.handleDown.bind(this));
     this.canvas.addEventListener("touchstart", this.handleDown.bind(this));
     window.addEventListener("mouseup", this.handleUp.bind(this));
     window.addEventListener("touchend", this.handleUp.bind(this));
     window.addEventListener("touchcancel", this.handleUp.bind(this));
+
+    book_details_elem.querySelector(".closebtn")!.addEventListener("click", evt => {
+      this.clearCurrentlyViewing();
+    });
+    book_details_elem.querySelector(".navbtns .next")?.addEventListener("click", evt => {
+      if (this.currently_viewing && this.currently_viewing.next) {
+        this.viewBook(this.currently_viewing.next);
+      }
+    });
+    book_details_elem.querySelector(".navbtns .prev")?.addEventListener("click", evt => {
+      if (this.currently_viewing && this.currently_viewing.prev) {
+        this.viewBook(this.currently_viewing.prev);
+      }
+    });
   }
 
   handleResize() {
@@ -113,6 +134,12 @@ class BooksApp {
     this.renderer.setSize(this.pixelWidth, this.pixelHeight, false);
     this.camera.aspect = this.pixelWidth / this.pixelHeight;
     this.camera.updateProjectionMatrix();
+
+    if (this.mobile_layout) {
+      this.book_details.classList.add("mobile-layout");
+    } else {
+      this.book_details.classList.remove("mobile-layout");
+    }
   }
 
   render() {
@@ -153,7 +180,9 @@ class BooksApp {
   }
 
   getCoordsFromEvent(evt: MouseEvent | TouchEvent): { x: number, y: number } | null {
-    evt.preventDefault();
+    if (evt.target === this.canvas) {
+      evt.preventDefault();
+    }
     let x: number, y: number;
     if (evt instanceof MouseEvent) {
       x = evt.clientX / this.pixelWidth * 2 - 1;
@@ -197,8 +226,8 @@ class BooksApp {
       if (this.cameraTargetPos.y < -3) {
         this.cameraTargetPos.setY(-3);
       }
-      if (this.cameraTargetPos.x > 10) {
-        this.cameraTargetPos.setX(10);
+      if (this.cameraTargetPos.x > 5) {
+        this.cameraTargetPos.setX(5);
       }
       if (this.cameraTargetPos.x < -1) {
         this.cameraTargetPos.setX(-1);
@@ -217,6 +246,9 @@ class BooksApp {
     if (b) {
       b.hovered = true;
       this.canvas.style.cursor = "pointer";
+      this.canvas.title = b.metadata.title;
+    } else {
+      this.canvas.title = "";
     }
   }
 
@@ -230,7 +262,14 @@ class BooksApp {
     this.lastMouseY = y;
 
     if (this.currently_viewing) {
-      if (x > 0) {
+      let should_clear = false;
+      if (!this.mobile_layout && (x > 0 || Math.abs(y) >= 0.8)) {
+        should_clear = true;
+      }
+      if (this.mobile_layout && y < 0) {
+        should_clear = true;
+      }
+      if (should_clear) {
         this.clearCurrentlyViewing();
       } else {
         this.rotating_book = true;
@@ -249,7 +288,8 @@ class BooksApp {
     }
   }
 
-  handleUp() {
+  handleUp(evt: Event) {
+    evt.preventDefault();
     this.rotating_book = false;
     this.dragging_camera = false;
     if (this.debug_controls) {
@@ -257,33 +297,102 @@ class BooksApp {
     }
   }
 
+  view_book_transform_timer: number | null = null;
+
   viewBook(book: BookObject) {
+    if (this.view_book_transform_timer !== null) {
+      clearInterval(this.view_book_transform_timer);
+      this.view_book_transform_timer = null;
+    }
     if (this.currently_viewing === book) {
       return;
     }
+    for (let b of allBookHitboxes) {
+      b.book.hovered = false;
+    }
+    let should_delay = false;
     if (this.currently_viewing) {
       this.clearCurrentlyViewing();
+      should_delay = true;
     }
+    this.canvas.title = "";
     this.currently_viewing = book;
     let campos = this.cameraTargetPos;
-    book.transformToFront(
-      new Vector3(campos.x - (this.pixelWidth / this.pixelHeight) * 0.7, campos.y - 0.5, 2.2),
-      new Euler(-Math.PI * 20 / 180, -Math.PI / 2, 0));
+    let x: number, y: number, z: number;
+    if (this.mobile_layout) {
+      x = campos.x;
+      y = campos.y - 0.2;
+      z = 1.5;
+    } else {
+      x = campos.x - (this.pixelWidth / this.pixelHeight) * 0.7;
+      y = campos.y - 0.5;
+      z = 2.2;
+    }
+    function do_transform() {
+      book.transformToFront(
+        new Vector3(x, y, z),
+        new Euler(-Math.PI * 20 / 180, -Math.PI / 2, 0));
+    }
+    if (!should_delay) {
+      do_transform();
+    } else {
+      this.view_book_transform_timer = setTimeout(do_transform, 300);
+    }
+
+    this.book_details.classList.add("show");
+    let title_container = this.book_details.querySelector("#book-title")!;
+    title_container.innerHTML = "";
+    let a = document.createElement("a");
+    a.textContent = book.metadata.title;
+    a.target = "_blank";
+    a.href = book.metadata.url;
+    title_container.appendChild(a);
+    let series_elem = this.book_details.querySelector("#book-series")! as HTMLElement;
+    if (book.metadata.series) {
+      series_elem.style.display = "";
+      series_elem.innerText = book.metadata.series;
+    } else {
+      series_elem.innerHTML = "";
+      series_elem.style.display = "none";
+    }
+    this.book_details.querySelector("#book-author")!.textContent = book.metadata.author;
+    if (book.next) {
+      this.book_details.querySelector(".navbtns .next")!.classList.remove("disabled");
+    } else {
+      this.book_details.querySelector(".navbtns .next")!.classList.add("disabled");
+    }
+    if (book.prev) {
+      this.book_details.querySelector(".navbtns .prev")!.classList.remove("disabled");
+    } else {
+      this.book_details.querySelector(".navbtns .prev")!.classList.add("disabled");
+    }
+    if (book.metadata.description) {
+      this.book_details.querySelector("#book-desc")!.innerHTML = book.metadata.description;
+    } else {
+      this.book_details.querySelector("#book-desc")!.innerHTML = `<i>Oops, I forgot to write a description here!</i>`;
+    }
   }
 
   clearCurrentlyViewing() {
+    if (this.view_book_transform_timer !== null) {
+      clearInterval(this.view_book_transform_timer);
+      this.view_book_transform_timer = null;
+    }
+    this.canvas.title = "";
     if (this.currently_viewing) {
       this.currently_viewing.transformBack();
     }
     this.currently_viewing = null;
+    this.book_details.classList.remove("show");
   }
 }
 
 function init() {
   let canvas = document.getElementById("scene") as HTMLCanvasElement;
+  let book_details = document.getElementsByClassName("bookdetails")[0];
   let app;
   try {
-    app = new BooksApp(canvas);
+    app = new BooksApp(canvas, book_details);
     app.render();
   } catch (e) {
     console.error(e);
