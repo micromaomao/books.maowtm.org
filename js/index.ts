@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { DirectionalLightShadow, Vector3 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { BookObject, BookShelf, ready as book_ready } from './book';
+import { BookRow, ready as book_ready } from './book';
+import { Frame, ready as frame_ready } from "./frames";
 import { getBookList } from "../books/booklist";
 import { SSAOPass } from "three/examples/jsm/postprocessing/SSAOPass";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
@@ -14,6 +15,7 @@ const dom_ready = new Promise((resolve) => {
 
 const loading_promise = Promise.all([
   book_ready,
+  frame_ready,
   dom_ready
 ]);
 
@@ -26,52 +28,52 @@ class BooksApp {
   camera: THREE.PerspectiveCamera;
   last_time: number;
   composer: EffectComposer;
-  ssao_pass: SSAOPass;
 
   fov = 75;
 
   debug_controls: OrbitControls | null;
 
   constructor(canvasElem: HTMLCanvasElement) {
-    this.pixelWidth = window.innerWidth * window.devicePixelRatio;
-    this.pixelHeight = window.innerHeight * window.devicePixelRatio;
+    this.pixelWidth = window.innerWidth;
+    this.pixelHeight = window.innerHeight;
     this.canvas = canvasElem;
     this.canvas.width = this.pixelWidth;
     this.canvas.height = this.pixelHeight;
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
+      antialias: true,
     });
+    this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.shadowMap.enabled = true;
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0xaaaaaa);
     this.camera = new THREE.PerspectiveCamera(this.fov, 1, 0.001, 1000);
     this.scene.add(this.camera);
     this.composer = new EffectComposer(this.renderer);
-    this.ssao_pass = new SSAOPass(this.scene, this.camera, this.pixelWidth, this.pixelHeight);
-    this.ssao_pass.kernelRadius = 16;
-    this.ssao_pass.minDistance = 0.003;
-    this.ssao_pass.maxDistance = 0.2;
-    this.composer.addPass(this.ssao_pass);
 
     this.handleResize();
     window.addEventListener("resize", this.handleResize.bind(this));
 
     let ambient = new THREE.AmbientLight(0xffffff, 0.8);
     this.scene.add(ambient);
-
-    let bs = new BookShelf(getBookList()["Haruhi Suzumiya"]);
-    this.scene.add(bs);
-
     let dir = new THREE.DirectionalLight(0xffffff, 0.5);
     dir.castShadow = true;
-    dir.position.set(0, 5, 3);
+    dir.shadow.mapSize.set(2048, 2048);
+    dir.shadow.normalBias = 0.01;
+    dir.position.set(1, 5, 3);
     this.scene.add(dir);
 
+    let f = new Frame();
+    this.scene.add(f);
+
+    let bs = new BookRow(getBookList()["Haruhi Suzumiya"]);
+    this.scene.add(bs);
+
     this.camera.position.set(1, 1, 3);
-    this.camera.lookAt(new Vector3(1, 1, 0));
+    this.camera.lookAt(new Vector3(1, 0.5, 0));
 
     this.debug_controls = new OrbitControls(this.camera, this.canvas);
-    this.debug_controls.target = new Vector3(1, 1, 0);
+    this.debug_controls.target = new Vector3(1, 0.5, 0);
     this.debug_controls.update();
 
     // this.scene.add(new THREE.DirectionalLightHelper(dir, 0.8));
@@ -82,14 +84,13 @@ class BooksApp {
   }
 
   handleResize() {
-    this.pixelWidth = window.innerWidth * window.devicePixelRatio;
-    this.pixelHeight = window.innerHeight * window.devicePixelRatio;
+    this.pixelWidth = window.innerWidth;
+    this.pixelHeight = window.innerHeight;
+    this.renderer.setPixelRatio(window.devicePixelRatio);
     // Don't update style, because canvas should always be 100vw/vh
     this.renderer.setSize(this.pixelWidth, this.pixelHeight, false);
     this.camera.aspect = this.pixelWidth / this.pixelHeight;
     this.camera.updateProjectionMatrix();
-    this.ssao_pass.width = this.pixelWidth;
-    (this.ssao_pass as any).height = this.pixelHeight; // TODO: fix
   }
 
   render() {
@@ -101,7 +102,8 @@ class BooksApp {
       this.debug_controls.update();
     }
 
-    this.composer.render(delta);
+    // this.composer.render(delta);
+    this.renderer.render(this.scene, this.camera);
   }
 }
 

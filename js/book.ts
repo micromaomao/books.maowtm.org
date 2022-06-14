@@ -1,13 +1,10 @@
 import * as THREE from 'three';
 import { Mesh, MeshStandardMaterial, Object3D, Texture, TextureLoader, Vector3 } from 'three';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { loadModel } from "./utils"
 
-const bookglb: string = require("url:../models/book.gltf");
-const bookshelfglb: string = require("url:../models/bookshelf.gltf");
-const meshLoader = new GLTFLoader();
 const textureLoader = new TextureLoader();
 let bookModel: GLTF | null = null;
-let bookshelfModel: GLTF | null = null;
 let paperMaterial: MeshStandardMaterial | null = null;
 
 const MESHNAME_BOOK = "book";
@@ -40,8 +37,6 @@ export class BookObject extends THREE.Object3D {
     });
     let cloned = bookModel.scene.clone(true);
     cloned.traverse(child => {
-      // child.castShadow = true;
-      child.receiveShadow = true;
       if (child.name === MESHNAME_BOOK || child.name === MESHNAME_PAPER) {
         let mchild = child as Mesh;
         mchild.geometry = mchild.geometry.clone();
@@ -101,59 +96,42 @@ export class BookObject extends THREE.Object3D {
   }
 }
 
-export class BookShelf extends Object3D {
+export class BookRow extends Object3D {
   books: BookObject[] = [];
-
-  static generateColor(): number {
-    let r = Math.floor(Math.random() * (256 - 70)) + 70;
-    let g = Math.floor(Math.random() * (256 - 70)) + 70;
-    let b = Math.floor(Math.random() * (256 - 70)) + 70;
-    return r << 16 | g << 8 | b;
-  }
 
   constructor(books: BookObject[]) {
     super();
     this.books = books;
-    if (bookshelfModel === null) {
-      throw new Error("await book.ready first.");
-    }
-    let cloned = bookshelfModel.scene.clone(true);
-    let bs = cloned.children[0] as Mesh;
-    bs.material = new THREE.MeshStandardMaterial({
-      color: BookShelf.generateColor(),
-      roughness: 0.9,
-    });
-    bs.castShadow = true;
-    bs.receiveShadow = true;
-    this.add(bs);
 
     let xx = 0;
-    for (let b of books.reverse()) {
+    books.reverse();
+    for (let b of books) {
       this.add(b);
       b.position.setX(xx);
       b.position.add(new Vector3(b.thickness / 2, b.height / 2, b.width / 2 - 0.7));
       xx += b.thickness + 0.007;
     }
+    if (books.length > 0) {
+      let first_book = books[0];
+      first_book.rotateZ(0.03);
+      first_book.position.add(new Vector3(-0.025, 0, 0));
+      if (books.length > 1) {
+        let second_book = books[1];
+        second_book.rotateZ(0.025);
+        second_book.position.add(new Vector3(-0.015, 0, 0));
+        if (books.length > 2) {
+          let third_book = books[2];
+          third_book.rotateZ(0.015);
+          third_book.position.add(new Vector3(-0.005, 0, 0));
+        }
+      }
+    }
+    for (let book of books) {
+      let zoff = (Math.random() - 0.3) * 0.05;
+      book.position.add(new Vector3(0, 0, zoff));
+    }
   }
 }
-
-const loadMesh = new Promise((resolve, reject) => {
-  meshLoader.load(bookglb, gltf => {
-    bookModel = gltf;
-    resolve(null);
-  }, undefined, err => {
-    reject(new Error(`Failed to load book.glb: ${err}`));
-  });
-});
-
-const loadBookshelf = new Promise((resolve, reject) => {
-  meshLoader.load(bookshelfglb, gltf => {
-    bookshelfModel = gltf;
-    resolve(null);
-  }, undefined, err => {
-    reject(new Error(`Failed to load bookshelf.glb: ${err}`));
-  });
-});
 
 const loadPaperMaterial = new Promise((resolve, reject) => {
   textureLoader.load(require("url:../models/paper.png"), tex => {
@@ -168,4 +146,7 @@ const loadPaperMaterial = new Promise((resolve, reject) => {
   });
 })
 
-export const ready = Promise.all([loadMesh, loadPaperMaterial, loadBookshelf]);
+export const ready = Promise.all([
+  loadModel(require("url:../models/book.gltf")).then(x => bookModel = x),
+  loadPaperMaterial
+]);
