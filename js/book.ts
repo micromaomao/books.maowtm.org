@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { BoxGeometry, Euler, Matrix4, Mesh, MeshStandardMaterial, Object3D, Quaternion, Texture, TextureLoader, Vector3 } from 'three';
+import { BoxGeometry, BoxHelper, Euler, Matrix4, Mesh, MeshStandardMaterial, Object3D, Quaternion, Texture, TextureLoader, Vector3 } from 'three';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { loadModel } from "./utils"
 
@@ -19,6 +19,9 @@ const TRANSFORM_SPEED = 3;
 const hitboxMaterial = new THREE.SpriteMaterial({
   visible: false
 });
+// const hitboxMaterial = new THREE.MeshStandardMaterial({
+//   color: 0xffffff
+// });
 
 export const allBookHitboxes: BookHitbox[] = [];
 
@@ -90,8 +93,8 @@ export class BookObject extends THREE.Object3D {
             }
           }
           posarr.array[i*3] = x;
-          posarr[i*3 + 1] *= yscale;
-          posarr[i*3 + 2] *= zscale;
+          posarr.array[i*3 + 2] *= yscale;
+          posarr.array[i*3 + 1] *= zscale;
           if (x > thickness) {
             thickness = x;
           }
@@ -299,6 +302,6 @@ export interface BookMetadata {
   title: string,
   author: string,
   url: string,
-  series: string | undefined,
+  series?: string | undefined,
   description?: string | undefined,
 }

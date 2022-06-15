@@ -71,5 +71,17 @@ export const getBookList = () => ({
         <p>This is the 7th book in the Haruhi Suzumiya series. Please check out the first one if you don't know what this is!
       `
     }),
+  ],
+  "2": [
+    new BookObject(require("url:../books/img/rust-for-rustaceans.png"), 0.5, 17/14, 23/21, {
+      title: "Rust for Rustaceans",
+      author: "Jon Gjengset",
+      url: "https://nostarch.com/rust-rustaceans",
+      description: `
+        <p><i><b>Rust for Rustaceans</b> &mdash; Idiomatic Programming for Experienced Developers</i> is a great book on mid-advanced Rust topics.
+
+        // TODO
+      `
+    })
   ]
 });

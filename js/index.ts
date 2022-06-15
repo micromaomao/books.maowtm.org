@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Euler, Quaternion, Raycaster, Vector3 } from 'three';
+import { BoxHelper, Euler, Quaternion, Raycaster, Vector3 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { BookRow, ready as book_ready, allBookHitboxes, BookHitbox, BookObject } from './book';
 import { Frame, ready as frame_ready } from "./frames";
@@ -80,14 +80,21 @@ class BooksApp {
     dir.position.set(1, 5, 3);
     this.scene.add(dir);
 
+    let blist = getBookList();
+
     let f = new Frame();
     this.scene.add(f);
     this.updateHandlers.push(f.update.bind(f));
 
-    let bs = new BookRow(getBookList()["Haruhi Suzumiya"]);
+    let bs = new BookRow(blist["Haruhi Suzumiya"]);
     bs.position.setY(0.02);
     this.scene.add(bs);
     this.updateHandlers.push(bs.update.bind(bs));
+
+    let bs2 = new BookRow(blist["2"]);
+    this.scene.add(bs2);
+    bs2.position.setY(0.02 - 2.48);
+    this.updateHandlers.push(bs2.update.bind(bs2));
 
     this.cameraTargetPos = new Vector3(1, 2, 3);
     this.camera.position.copy(this.cameraTargetPos);
@@ -114,6 +121,8 @@ class BooksApp {
     window.addEventListener("touchend", this.handleUp.bind(this));
     window.addEventListener("touchcancel", this.handleUp.bind(this));
 
+    window.addEventListener("keydown", this.handleKeyDown.bind(this));
+
     book_details_elem.querySelector(".closebtn")!.addEventListener("click", evt => {
       this.clearCurrentlyViewing();
     });
@@ -127,6 +136,10 @@ class BooksApp {
         this.viewBook(this.currently_viewing.prev);
       }
     });
+
+    // for (let hb of allBookHitboxes) {
+    //   this.scene.add(new BoxHelper(hb));
+    // }
   }
 
   handleResize() {
@@ -166,6 +179,9 @@ class BooksApp {
     let targetCamPos = this.cameraTargetPos.clone();
     if (this.currently_viewing) {
       targetCamPos.add(new Vector3(0, 0.5, 0.8));
+      if (this.mobile_layout) {
+        targetCamPos.add(new Vector3(0, 0.1, 0.2));
+      }
     }
     this.camera.position.lerp(targetCamPos, 10 * delta);
 
@@ -330,7 +346,7 @@ class BooksApp {
     if (this.mobile_layout) {
       x = campos.x;
       y = campos.y - 0.2;
-      z = 1.5;
+      z = 1.7;
     } else {
       x = campos.x - (this.pixelWidth / this.pixelHeight) * 0.7;
       y = campos.y - 0.5;
@@ -392,6 +408,13 @@ class BooksApp {
     }
     this.currently_viewing = null;
     this.book_details.classList.remove("show");
+  }
+
+  handleKeyDown(evt: KeyboardEvent) {
+    if (evt.key === "Escape") {
+      evt.preventDefault();
+      this.clearCurrentlyViewing();
+    }
   }
 }
 
