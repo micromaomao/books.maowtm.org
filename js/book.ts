@@ -196,8 +196,9 @@ export class BookObject extends THREE.Object3D {
       throw new Error("unreachable");
     }
     let target_trans = m_world.invert();
+    // targetPos is world space coords
     target_trans.multiply(new Matrix4().compose(targetPos, new Quaternion().setFromEuler(targetRot), curr_scale));
-    let target_pos = new Vector3();
+    let target_pos = new Vector3(); // local space coords
     let target_rot = new Quaternion();
     target_trans.decompose(target_pos, target_rot, new Vector3());
     this.bookMesh.matrix.copy(this.savedTransformMatrix);

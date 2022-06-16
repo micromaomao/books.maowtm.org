@@ -179,9 +179,10 @@ class BooksApp {
 
     let targetCamPos = this.cameraTargetPos.clone();
     if (this.currently_viewing) {
-      targetCamPos.add(new Vector3(0, 0.5, 0.8));
       if (this.mobile_layout) {
-        targetCamPos.add(new Vector3(0, 0.1, 0.2));
+        targetCamPos.add(new Vector3(0, 0.6, 1.0));
+      } else {
+        targetCamPos.add(new Vector3(0, 0.5, 0.8));
       }
     }
     if (!this.debug_controls || !this.debug_controls.enabled) {
@@ -351,7 +352,7 @@ class BooksApp {
       y = campos.y - 0.2;
       z = 1.7;
     } else {
-      x = campos.x - (this.pixelWidth / this.pixelHeight) * 0.7;
+      x = campos.x - 0.8;
       y = campos.y - 0.5;
       z = 2.2;
     }
