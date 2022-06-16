@@ -255,11 +255,11 @@ export class BookRow extends Object3D {
     if (books.length > 0) {
       let first_book = books[0];
       first_book.rotateZ(0.03);
-      first_book.position.add(new Vector3(-0.025, 0, 0));
+      first_book.position.add(new Vector3(-0.025, 0.01, 0));
       if (books.length > 1) {
         let second_book = books[1];
         second_book.rotateZ(0.025);
-        second_book.position.add(new Vector3(-0.015, 0, 0));
+        second_book.position.add(new Vector3(-0.015, 0.01, 0));
         if (books.length > 2) {
           let third_book = books[2];
           third_book.rotateZ(0.015);

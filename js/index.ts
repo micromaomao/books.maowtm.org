@@ -1,10 +1,9 @@
 import * as THREE from 'three';
-import { BoxHelper, Euler, Quaternion, Raycaster, Vector3 } from 'three';
+import { Euler, Quaternion, Raycaster, Vector3 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { BookRow, ready as book_ready, allBookHitboxes, BookHitbox, BookObject } from './book';
 import { Frame, ready as frame_ready } from "./frames";
 import { getBookList } from "../books/booklist";
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
 
 const dom_ready = new Promise((resolve) => {
   document.addEventListener("DOMContentLoaded", evt => {
@@ -62,7 +61,7 @@ class BooksApp {
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.shadowMap.enabled = true;
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0xaaaaaa);
+    this.scene.background = new THREE.Color(0x826988);
     this.camera = new THREE.PerspectiveCamera(this.fov, 1, 0.001, 1000);
     this.scene.add(this.camera);
 
@@ -71,13 +70,17 @@ class BooksApp {
 
     setInterval(() => this.handleResize(), 1000); // Weird chrome bug
 
-    let ambient = new THREE.AmbientLight(0xffffff, 0.7);
+    let ambient = new THREE.AmbientLight(0xffffff, 0.85);
     this.scene.add(ambient);
-    let dir = new THREE.DirectionalLight(0xffffff, 0.5);
+    let dir = new THREE.DirectionalLight(0xffffff, 0.25);
     dir.castShadow = true;
     dir.shadow.mapSize.set(2048, 2048);
     dir.shadow.normalBias = 0.01;
-    dir.position.set(1, 5, 3);
+    // dir.shadow.camera.left -= 4;
+    // dir.shadow.camera.right += 8;
+    // dir.shadow.blurSamples *= 2;
+    // dir.shadow.radius += 0.25;
+    dir.position.set(1, 10, 8.5);
     this.scene.add(dir);
 
     let blist = getBookList();
@@ -102,8 +105,6 @@ class BooksApp {
 
     // this.debug_controls = new OrbitControls(this.camera, this.canvas);
     // this.debug_controls.target = new Vector3(1, 0.5, 0);
-    // this.debug_controls.enableDamping = true;
-    // this.debug_controls.enableRotate = false;
     // this.debug_controls.update();
 
     // this.scene.add(new THREE.DirectionalLightHelper(dir, 0.8));
@@ -183,7 +184,9 @@ class BooksApp {
         targetCamPos.add(new Vector3(0, 0.1, 0.2));
       }
     }
-    this.camera.position.lerp(targetCamPos, 10 * delta);
+    if (!this.debug_controls || !this.debug_controls.enabled) {
+      this.camera.position.lerp(targetCamPos, 10 * delta);
+    }
 
     // this.composer.render(delta);
     this.renderer.render(this.scene, this.camera);
@@ -251,8 +254,8 @@ class BooksApp {
       if (this.cameraTargetPos.x > 5) {
         this.cameraTargetPos.setX(5);
       }
-      if (this.cameraTargetPos.x < -1) {
-        this.cameraTargetPos.setX(-1);
+      if (this.cameraTargetPos.x < -0.5) {
+        this.cameraTargetPos.setX(-0.5);
       }
       return;
     }
