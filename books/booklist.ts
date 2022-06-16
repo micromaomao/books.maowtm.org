@@ -78,10 +78,19 @@ export const getBookList = () => ({
       author: "Jon Gjengset",
       url: "https://nostarch.com/rust-rustaceans",
       description: `
-        <p><i><b>Rust for Rustaceans</b> &mdash; Idiomatic Programming for Experienced Developers</i> is a great book on mid-advanced Rust topics.
-
-        // TODO
+        <p><i><b>Rust for Rustaceans</b> &mdash; Idiomatic Programming for Experienced Developers</i> is a great book on
+        intermediate-to-advanced Rust topics. It is written by Jon Gjengset, who has a YouTube channel and does a lot of
+        Rust-coding streams, touching various advanced topics like lock-free programming.
       `
-    })
+    }),
+    new BookObject(require("url:../books/img/shortesthistoryeurope.png"), 0.4, 1, 1, {
+      title: "The Shortest History of Europe",
+      author: "John Hirst",
+      url: "https://www.goodreads.com/book/show/6934913-the-shortest-history-of-europe",
+      description: `
+        <p>This is a light read on certain aspects of European history from the Roman Empire era to
+        pre-modern times, covering topics like forms of government, language, religion, argiculture, etc.
+      `
+    }),
   ]
 });
