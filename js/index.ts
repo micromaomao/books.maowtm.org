@@ -124,6 +124,8 @@ class BooksApp {
 
     window.addEventListener("keydown", this.handleKeyDown.bind(this));
 
+    this.canvas.addEventListener("wheel", this.handleScroll.bind(this));
+
     book_details_elem.querySelector(".closebtn")!.addEventListener("click", evt => {
       this.clearCurrentlyViewing();
     });
@@ -222,6 +224,21 @@ class BooksApp {
     return { x, y };
   }
 
+  fixCameraTargetPos() {
+    if (this.cameraTargetPos.y > 2.5) {
+      this.cameraTargetPos.setY(2.5);
+    }
+    if (this.cameraTargetPos.y < -3) {
+      this.cameraTargetPos.setY(-3);
+    }
+    if (this.cameraTargetPos.x > 5) {
+      this.cameraTargetPos.setX(5);
+    }
+    if (this.cameraTargetPos.x < -0.5) {
+      this.cameraTargetPos.setX(-0.5);
+    }
+  }
+
   handleMove(evt: MouseEvent | TouchEvent) {
     let coords = this.getCoordsFromEvent(evt);
     if (!coords) {
@@ -246,18 +263,7 @@ class BooksApp {
     }
     if (this.dragging_camera) {
       this.cameraTargetPos.add(new Vector3(deltaX, deltaY, 0).multiplyScalar(-3));
-      if (this.cameraTargetPos.y > 2.5) {
-        this.cameraTargetPos.setY(2.5);
-      }
-      if (this.cameraTargetPos.y < -3) {
-        this.cameraTargetPos.setY(-3);
-      }
-      if (this.cameraTargetPos.x > 5) {
-        this.cameraTargetPos.setX(5);
-      }
-      if (this.cameraTargetPos.x < -0.5) {
-        this.cameraTargetPos.setX(-0.5);
-      }
+      this.fixCameraTargetPos();
       return;
     }
 
@@ -419,6 +425,20 @@ class BooksApp {
       evt.preventDefault();
       this.clearCurrentlyViewing();
     }
+  }
+
+  handleScroll(evt: WheelEvent) {
+    evt.preventDefault();
+    if (this.currently_viewing) {
+      return;
+    }
+    let { deltaX, deltaY } = evt;
+    if (evt.shiftKey) {
+      [deltaX, deltaY] = [deltaY, deltaX];
+    }
+    deltaX *= -1;
+    this.cameraTargetPos.add(new Vector3(deltaX, deltaY, 0).multiplyScalar(-0.003));
+    this.fixCameraTargetPos();
   }
 }
 
