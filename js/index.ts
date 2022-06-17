@@ -350,6 +350,7 @@ class BooksApp {
   view_book_transform_timer: number | null = null;
 
   viewBook(book: BookObject) {
+    closeHint();
     if (this.view_book_transform_timer !== null) {
       clearInterval(this.view_book_transform_timer);
       this.view_book_transform_timer = null;
@@ -458,6 +459,13 @@ class BooksApp {
   }
 }
 
+let loading = document.getElementsByClassName("loading")[0] as HTMLElement;
+let hint = document.getElementsByClassName("hint")[0] as HTMLElement;
+
+function closeHint() {
+  hint.style.display = "none";
+}
+
 function init() {
   let canvas = document.getElementById("scene") as HTMLCanvasElement;
   let book_details = document.getElementsByClassName("bookdetails")[0];
@@ -465,6 +473,9 @@ function init() {
   try {
     app = new BooksApp(canvas, book_details);
     app.render();
+    loading.style.display = "none";
+    hint.style.display = "";
+    hint.querySelector(".closebtn")!.addEventListener("click", closeHint);
   } catch (e) {
     console.error(e);
     alert(`Error: ${e.message}`);

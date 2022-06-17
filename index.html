@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,6 +12,7 @@
       overflow: hidden;
       font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     }
+
     #scene {
       position: absolute;
       left: 0;
@@ -18,6 +20,7 @@
       width: 100vw;
       height: 100vh;
     }
+
     .bookdetails {
       position: absolute;
       right: 10%;
@@ -39,10 +42,12 @@
       flex-wrap: nowrap;
       align-items: center;
     }
+
     .bookdetails.show {
       transform: translate(0, 0);
       pointer-events: initial;
     }
+
     .bookdetails.mobile-layout {
       left: 5%;
       right: 5%;
@@ -52,6 +57,7 @@
       width: auto;
       transform: translateY(50vh);
     }
+
     .bookdetails.mobile-layout.show {
       transform: translate(0, 0);
     }
@@ -67,11 +73,11 @@
       margin-top: 5px;
     }
 
-    .bookdetails .closebtn {
+    .closebtn {
       cursor: pointer;
       display: inline-block;
       padding: 10px;
-      margin-top: auto;
+      margin: auto auto 0 auto;
     }
 
     .bookdetails .navbtns {
@@ -83,14 +89,14 @@
       width: 100%;
     }
 
-    .bookdetails .navbtns > span {
+    .bookdetails .navbtns>span {
       cursor: pointer;
       display: inline-block;
       font-size: 110%;
       padding: 8px;
     }
 
-    .bookdetails .navbtns > span.disabled {
+    .bookdetails .navbtns>span.disabled {
       cursor: not-allowed;
       opacity: 0.5;
     }
@@ -115,7 +121,7 @@
       height: auto;
       padding: 2px;
       margin: 0;
-      background-color: rgba(255,255,255,0.5);
+      background-color: rgba(255, 255, 255, 0.5);
       color: black;
       text-align: center;
     }
@@ -123,8 +129,46 @@
     .githublink a {
       color: darkcyan;
     }
+
+    .hint {
+      background-color: rgba(47, 71, 95, 0.856);
+      color: white;
+      font-size: 20px;
+      position: absolute;
+      bottom: 10%;
+      left: 25%;
+      right: 25%;
+      height: auto;
+      text-align: center;
+      padding: 10px;
+      backdrop-filter: blur(10px);
+    }
+
+    .loading {
+      position: absolute;
+      top: 40%;
+      left: 0;
+      right: 0;
+      height: auto;
+      text-align: center;
+    }
+
+    .loading .fill {
+      display: inline-block;
+      width: auto;
+      margin: auto;
+      background-color: rgba(200, 200, 200, 0.5);
+      padding: 10px 20px;
+      font-size: 20px;
+      color: black;
+    }
+
+    .hint .closebtn {
+      font-size: 16px;
+    }
   </style>
 </head>
+
 <body>
   <noscript>
     This page requires JavaScript to work.
@@ -147,5 +191,23 @@
     <a href="https://github.com/micromaomao/books.maowtm.org" target="_blank">View on GitHub</a><br>
     <span style="font-size: 70%;">(includes CC attributions)</span>
   </div>
+
+  <div class="hint" style="display: none;">
+    Pan around with mouse or touch. Click on a book to view.<br>
+    Books can be rotated when viewing.<br>
+    <div class="closebtn">&times; Close</div>
+  </div>
+
+  <div class="loading">
+    <div class="fill">
+      <video muted autoplay width="256" height="256" loop style="width: 100px; height: 100px;">
+        <source src="./loading.mp4" type="video/mp4">
+        <source src="./loading.webm" type="video/webm">
+      </video>
+      <br>
+      Loading&hellip;
+    </div>
+  </div>
 </body>
+
 </html>
