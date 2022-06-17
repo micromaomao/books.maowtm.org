@@ -94,10 +94,26 @@ class BooksApp {
     this.scene.add(bs);
     this.updateHandlers.push(bs.update.bind(bs));
 
-    let bs2 = new BookRow(blist["2"]);
+    let bs2 = new BookRow(blist["Non-fiction"]);
     this.scene.add(bs2);
     bs2.position.setY(0.02 - 2.48);
     this.updateHandlers.push(bs2.update.bind(bs2));
+
+    let wf = blist["whatif"];
+    this.scene.add(wf);
+    wf.rotateY(-Math.PI / 2);
+    wf.rotateZ(Math.PI / 2);
+    wf.rotateX(-Math.PI / 180 * 5) // world z
+    wf.position.set(2.3, -2.39, -0.15);
+    this.updateHandlers.push(wf.update.bind(wf));
+
+    bs2.books[bs2.books.length - 1].next = wf;
+    wf.prev = bs2.books[bs2.books.length - 1];
+
+    let bs3 = new BookRow(blist["CS"]);
+    this.scene.add(bs3);
+    bs3.position.setY(0.02 - 2.48 * 2);
+    this.updateHandlers.push(bs3.update.bind(bs3));
 
     this.cameraTargetPos = new Vector3(1, 2, 3);
     this.camera.position.copy(this.cameraTargetPos);

@@ -72,28 +72,27 @@ export const getBookList = () => ({
       `
     }),
   ],
-  "2": [
-    new BookObject(require("url:../books/img/rust-for-rustaceans.png"), 0.5, 17/14, 23/21, {
-      title: "Rust for Rustaceans",
-      author: "Jon Gjengset",
-      url: "https://nostarch.com/rust-rustaceans",
+  "Non-fiction": [
+    new BookObject(require("url:../books/img/NoPlaceToHide.png"), 0.5, 1.05, 1.075, {
+      title: "No Place to Hide",
+      author: "Glenn Greenwald",
+      url: "https://www.goodreads.com/book/show/18213403-no-place-to-hide",
       description: `
-        <p><i><b>Rust for Rustaceans</b> &mdash; Idiomatic Programming for Experienced Developers</i> is a great book on
-        intermediate-to-advanced Rust topics. It is written by Jon Gjengset, who has a
-        <a target="_blank" href="https://www.youtube.com/c/JonGjengset">YouTube channel</a> and does a lot of
-        Rust-coding streams, touching various advanced topics like lock-free programming.
+        <p><b>No Place to Hide</b>: Edward Snowden, the NSA, and the U.S. Surveillance State
+
+        <p>A book about the surveillance program of USA and its partners. Also includes a discussion of press freedom in the US.
       `
     }),
-    new BookObject(require("url:../books/img/shortesthistoryeurope.png"), 0.4, 1, 1, {
-      title: "The Shortest History of Europe",
-      author: "John Hirst",
-      url: "https://www.goodreads.com/book/show/6934913-the-shortest-history-of-europe",
+    new BookObject(require("url:../books/img/SurelyYoureJoking.png"), 0.7, 1.05, 1.05, {
+      title: "Surely You're Joking, Mr. Feynman!",
+      author: "Richard P. Feynman",
+      url: "https://wwnorton.com/books/Surely-Youre-Joking-Mr-Feynman/",
       description: `
-        <p>This is a light read on certain aspects of European history from the Roman Empire era to
-        pre-modern times, covering topics like forms of government, language, religion, argiculture, etc.
+        <p><b>Richard P. Feynman</b> is an inspiring physicist and Nobel Prize winner. In this book, he described his
+        philosophy around scientific communication in a series of light-hearted stories, and is quite fun to read.
       `
     }),
-    new BookObject(require("url:../books/img/TheDisappearingSpoon.png"), 0.9, 0.9, 1, {
+    new BookObject(require("url:../books/img/TheDisappearingSpoon.png"), 0.9, 1, 1, {
       title: "The Disappearing Spoon",
       author: "Sam Kean",
       url: "https://www.goodreads.com/book/show/9800230-the-disappearing-spoon",
@@ -103,13 +102,27 @@ export const getBookList = () => ({
         <p>This is a book about some interesting history of chemistry and science in general. A bit long for my taste but still enjoyable.
       `
     }),
-    new BookObject(require("url:../books/img/SurelyYoureJoking.png"), 0.7, 1, 1, {
-      title: "Surely You're Joking, Mr. Feynman!",
-      author: "Richard P. Feynman",
-      url: "https://wwnorton.com/books/Surely-Youre-Joking-Mr-Feynman/",
+    new BookObject(require("url:../books/img/shortesthistoryeurope.png"), 0.4, 0.95, 0.95, {
+      title: "The Shortest History of Europe",
+      author: "John Hirst",
+      url: "https://www.goodreads.com/book/show/6934913-the-shortest-history-of-europe",
       description: `
-        <p><b>Richard P. Feynman</b> is an inspiring physicist and Nobel Prize winner. In this book, he described his
-        philosophy around scientific communication in a series of light-hearted stories, and is quite fun to read.
+        <p>This is a light read on certain aspects of European history from the Roman Empire era to
+        pre-modern times, covering topics like forms of government, language, religion, argiculture, etc.
+      `
+    }),
+    new BookObject(require("url:../books/img/IntoThinAir.png"), 0.7, 0.9, 0.95, {
+      title: "Into Thin Air",
+      author: "Jon Krakauer",
+      url: "https://www.goodreads.com/book/show/1898.Into_Thin_Air",
+      description: `
+        <p><b>Into Thin Air</b>: A Personal Account of the Mount Everest Disaster
+
+        <p>This was also one of the book
+        <a target="_blank" href="https://www.youtube.com/watch?v=NafbGOQBlQs">recommended by MinutePhysics</a>.
+        It is a first-person account of the author's 1996 trip to climb the Mount Everest, during which a number of
+        team members died in a storm and the author himself was nearly unable to make his return. It contains a lot
+        of vivid details about the whole trip which makes it really engaging to read.
       `
     }),
     new BookObject(require("url:../books/img/TrueNorth.png"), 0.7, 0.9, 0.9, {
@@ -126,5 +139,48 @@ export const getBookList = () => ({
         in this matter.
       `
     }),
-  ]
+    new BookObject(require("url:../books/img/ThinkingFastAndSlow.png"), 0.8, 0.85, 0.9, {
+      title: "Thinking, Fast and Slow",
+      author: "Daniel Kahneman",
+      url: "https://www.goodreads.com/book/show/11468377-thinking-fast-and-slow",
+      description: `
+        <p>A good book on some interesting psychology topics that may help your day-to-day decision-making.
+      `
+    }),
+  ],
+  "CS": [
+    new BookObject(require("url:../books/img/rust-for-rustaceans.png"), 0.5, 17/14, 23/21, {
+      title: "Rust for Rustaceans",
+      author: "Jon Gjengset",
+      url: "https://nostarch.com/rust-rustaceans",
+      description: `
+        <p><i><b>Rust for Rustaceans</b> &mdash; Idiomatic Programming for Experienced Developers</i> is a great book on
+        intermediate-to-advanced Rust topics. It is written by Jon Gjengset, who has a
+        <a target="_blank" href="https://www.youtube.com/c/JonGjengset">YouTube channel</a> and does a lot of
+        Rust-coding streams, touching various advanced topics like lock-free programming.
+      `
+    }),
+    new BookObject(require("url:../books/img/CrackingCodingInterview.png"), 1, 1, 1.05, {
+      title: "Cracking the Coding Interview",
+      author: "Gayle Laakmann McDowell",
+      url: "https://www.crackingthecodinginterview.com/",
+      description: `
+        <p>Pretty useful. For me I mostly read the behavioural part because that is my weakness.
+      `
+    }),
+  ],
+  "whatif":
+    new BookObject(require("url:../books/img/WhatIf.png"), 0.7, 1.3, 1.1, {
+      title: "What If?",
+      author: "Randall Munroe",
+      url: "https://what-if.xkcd.com/",
+      description: `
+        <p><b>What If?</b> Serious Scientific Answers to Absurd Hypothetical Questions</p>
+
+        <img src="${require("url:../books/img/xkcd.jpg")}" alt="Avatar of Randall Munroe - the stick figure"
+              style="width: 100%; max-width: 200px; margin: 10px auto; display: block;">
+
+        <p>Just click the link above and read a couple of chapters :)
+      `
+    })
 });
