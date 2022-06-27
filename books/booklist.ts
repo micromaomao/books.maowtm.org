@@ -62,13 +62,22 @@ export const getBookList = () => ({
         <p>This is the 6th book in the Haruhi Suzumiya series. Please check out the first one if you don't know what this is!
       `
     }),
-    new BookObject(require("url:../books/img/haruhi-7.png"), 0.5, 1, 1, {
+    new BookObject(require("url:../books/img/haruhi-7.png"), 0.7, 1, 1, {
       title: "The Intrigues of Haruhi Suzumiya",
       author: "Nagaru Tanigawa",
       series: "Haruhi Suzumiya Series",
       url: "https://yenpress.com/9781975324179/the-intrigues-of-haruhi-suzumiya-light-novel/",
       description: `
         <p>This is the 7th book in the Haruhi Suzumiya series. Please check out the first one if you don't know what this is!
+      `
+    }),
+    new BookObject(require("url:../books/img/haruhi-8.png"), 0.5, 1, 1, {
+      title: "The Indignation of Haruhi Suzumiya",
+      author: "Nagaru Tanigawa",
+      series: "Haruhi Suzumiya Series",
+      url: "https://yenpress.com/9780316038997/the-indignation-of-haruhi-suzumiya-light-novel/",
+      description: `
+        <p>This is the 8th book in the Haruhi Suzumiya series. Please check out the first one if you don't know what this is!
       `
     }),
   ],
