@@ -80,6 +80,15 @@ export const getBookList = () => ({
         <p>This is the 8th book in the Haruhi Suzumiya series. Please check out the first one if you don't know what this is!
       `
     }),
+    new BookObject(require("url:../books/img/haruhi-9.png"), 0.4, 1, 1, {
+      title: "The Dissociation of Haruhi Suzumiya",
+      author: "Nagaru Tanigawa",
+      series: "Haruhi Suzumiya Series",
+      url: "https://yenpress.com/9781975324193/the-dissociation-of-haruhi-suzumiya-light-novel/",
+      description: `
+        <p>This is the 9th book in the Haruhi Suzumiya series. Please check out the first one if you don't know what this is!
+      `
+    }),
   ],
   "Non-fiction": [
     new BookObject(require("url:../books/img/NoPlaceToHide.png"), 0.5, 1.05, 1.075, {
