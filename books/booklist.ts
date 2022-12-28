@@ -100,6 +100,51 @@ export const getBookList = () => ({
         <p>In the English version, the first and second volume of Surprise is combined into one book.
       `
     }),
+    new BookObject(require("url:../books/img/haruhi-11.png"), 0.5, 1, 1, {
+      title: "The Intuition of Haruhi Suzumiya",
+      author: "Nagaru Tanigawa",
+      series: "Haruhi Suzumiya Series",
+      url: "https://yenpress.com/9781975322540/the-intuition-of-haruhi-suzumiya-light-novel/",
+      description: `
+        <p>This is the 11th book in the Haruhi Suzumiya series (if we count Surprise as one book). Please check out the first one if you don't know what this is!
+      `
+    }),
+  ],
+  "Other-fiction": [
+    new BookObject(require("url:../books/img/TheLittlePrince.png"), 0.3, 1.05, 1.02, {
+      title: "The Little Prince",
+      author: "Antoine de Saint-Exupéry",
+      url: "https://en.wikipedia.org/wiki/The_Little_Prince",
+      description: `
+        <p>One of my childhood memories.
+      `
+    }),
+    new BookObject(require("url:../books/img/WhoMovedMyCheese.png"), 0.25, 0.85, 0.85, {
+      title: "Who Moved My Cheese",
+      author: "Spencer Johnson",
+      url: "https://en.wikipedia.org/wiki/Who_Moved_My_Cheese%3F",
+      description: `
+        <p><b>Who Moved My Cheese</b>: An Amazing Way to Deal with Change in Your Work and in Your Life
+
+        <p>First "proper" English book I finished, when I was in grade school. Super short.
+      `
+    }),
+    new BookObject(require("url:../books/img/matilda.png"), 0.6, 1.05, 0.95, {
+      title: "Matilda",
+      author: "Roald Dahl",
+      url: "https://www.goodreads.com/book/show/39988.Matilda",
+      description: `
+        <p>A interesting children's book I heard about during a random office lunch chat.
+      `
+    }),
+    new BookObject(require("url:../books/img/TheStarryRift.png"), 0.6, 1, 1, {
+      title: "The Starry Rift",
+      author: "James Tiptree Jr.",
+      url: "https://www.goodreads.com/book/show/27266495-the-starry-rift",
+      description: `
+        <p>A book of 3 independent stories set in the future.
+      `
+    }),
   ],
   "Non-fiction": [
     new BookObject(require("url:../books/img/NoPlaceToHide.png"), 0.5, 1.05, 1.075, {
@@ -176,6 +221,26 @@ export const getBookList = () => ({
         <p>A good book on some interesting psychology topics that may help your day-to-day decision-making.
       `
     }),
+    new BookObject(require("url:../books/img/NetworkingForPeopleWhoHate.png"), 0.65, 0.9, 0.95, {
+      title: "Networking for People Who Hate Networking",
+      author: "Devora Zack",
+      url: "https://www.goodreads.com/book/show/40396297-networking-for-people-who-hate-networking",
+      description: `
+        <p><b>Networking for People Who Hate Networking</b>: A Field Guide for Introverts, the Overwhelmed, and the Underconnected
+
+        <p>Some friend at work mentioned this, but I didn't quite like it.
+      `
+    }),
+    new BookObject(require("url:../books/img/HowToWinFriends.png"), 0.75, 0.85, 0.9, {
+      title: "How to Win Friends and Influence People",
+      author: "Dale Carnegie",
+      url: "https://www.goodreads.com/book/show/4865.How_to_Win_Friends_and_Influence_People",
+      description: `
+        <p>A guide to being nice, I guess.
+
+        <p>(Actually I did enjoy this)
+      `
+    }),
   ],
   "CS": [
     new BookObject(require("url:../books/img/rust-for-rustaceans.png"), 0.5, 17/14, 23/21, {
@@ -195,6 +260,16 @@ export const getBookList = () => ({
       url: "https://www.crackingthecodinginterview.com/",
       description: `
         <p>Pretty useful. For me I mostly read the behavioural part because that is my weakness.
+      `
+    }),
+    new BookObject(require("url:../books/img/PhilosophySoftware.png"), 0.4, 1.15, 0.95, {
+      title: "A Philosophy of Software Design",
+      author: "John Ousterhout",
+      url: "https://web.stanford.edu/~ouster/cgi-bin/aposd.php",
+      description: `
+        <p>I heard about this book from a <a target="_blank"
+        href="https://www.youtube.com/watch?v=bmSAYlu0NcY">Google Talk of the
+        same name</a>, by the author. Quite liked it.
       `
     }),
   ],

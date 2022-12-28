@@ -81,8 +81,8 @@ export class BookObject extends THREE.Object3D {
         let geom = mchild.geometry;
         let posarr = geom.attributes.position as any;
         let thickness = 0;
-        for (let i = 0; i < posarr.count; i ++) {
-          let x = posarr.array[i*3];
+        for (let i = 0; i < posarr.count; i++) {
+          let x = posarr.array[i * 3];
           if (Math.abs(x) < EDGE_CUTOFF_X) {
             x *= xscale;
           } else {
@@ -92,9 +92,9 @@ export class BookObject extends THREE.Object3D {
               x -= EDGE_CUTOFF_X * (1 - xscale);
             }
           }
-          posarr.array[i*3] = x;
-          posarr.array[i*3 + 2] *= yscale;
-          posarr.array[i*3 + 1] *= zscale;
+          posarr.array[i * 3] = x;
+          posarr.array[i * 3 + 2] *= yscale;
+          posarr.array[i * 3 + 1] *= zscale;
           if (x > thickness) {
             thickness = x;
           }
@@ -233,11 +233,11 @@ export class BookObject extends THREE.Object3D {
 export class BookRow extends Object3D {
   books: BookObject[] = [];
 
-  constructor(books: BookObject[]) {
+  constructor(books: BookObject[], right_to_left: boolean = false) {
     super();
     this.books = books;
 
-    for (let i = 0; i < books.length; i ++) {
+    for (let i = 0; i < books.length; i++) {
       if (i > 0) {
         books[i].prev = books[i - 1];
       }
@@ -246,25 +246,37 @@ export class BookRow extends Object3D {
       }
     }
 
+    // This is here because we want to set the next/prev links before reversing.
+    if (right_to_left) {
+      books.reverse();
+    }
+
     let xx = 0;
     for (let b of books) {
       this.add(b);
       b.position.setX(xx);
-      b.position.add(new Vector3(b.thickness / 2, b.height / 2, -b.width/2 + 0.3));
+      b.position.add(new Vector3(b.thickness / 2, b.height / 2, -b.width / 2 + 0.3));
+      if (right_to_left) {
+        b.position.setX(-b.position.x);
+      }
       xx += b.thickness + 0.007;
     }
     if (books.length > 0) {
       let first_book = books[0];
-      first_book.rotateZ(0.03);
-      first_book.position.add(new Vector3(-0.025, 0.01, 0));
+      let xsign = 1;
+      if (right_to_left) {
+        xsign = -1;
+      }
+      first_book.rotateZ(xsign * 0.03);
+      first_book.position.add(new Vector3(-xsign * 0.025, 0.01, 0));
       if (books.length > 1) {
         let second_book = books[1];
-        second_book.rotateZ(0.025);
-        second_book.position.add(new Vector3(-0.015, 0.01, 0));
+        second_book.rotateZ(xsign * 0.025);
+        second_book.position.add(new Vector3(-xsign * 0.015, 0.01, 0));
         if (books.length > 2) {
           let third_book = books[2];
-          third_book.rotateZ(0.015);
-          third_book.position.add(new Vector3(-0.005, 0, 0));
+          third_book.rotateZ(xsign * 0.015);
+          third_book.position.add(new Vector3(-xsign * 0.005, 0, 0));
         }
       }
     }

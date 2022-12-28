@@ -94,6 +94,12 @@ class BooksApp {
     this.scene.add(bs);
     this.updateHandlers.push(bs.update.bind(bs));
 
+    let bs_of = new BookRow(blist["Other-fiction"], true);
+    bs_of.position.setX(5.07);
+    bs_of.position.setY(0.02);
+    this.scene.add(bs_of);
+    this.updateHandlers.push(bs_of.update.bind(bs_of));
+
     let bs2 = new BookRow(blist["Non-fiction"]);
     this.scene.add(bs2);
     bs2.position.setY(0.02 - 2.48);
@@ -104,7 +110,7 @@ class BooksApp {
     wf.rotateY(-Math.PI / 2);
     wf.rotateZ(Math.PI / 2);
     wf.rotateX(-Math.PI / 180 * 5) // world z
-    wf.position.set(2.3, -2.39, -0.15);
+    wf.position.set(2.6, -2.39, -0.15);
     this.updateHandlers.push(wf.update.bind(wf));
 
     bs2.books[bs2.books.length - 1].next = wf;
@@ -247,8 +253,8 @@ class BooksApp {
     if (this.cameraTargetPos.y < -3) {
       this.cameraTargetPos.setY(-3);
     }
-    if (this.cameraTargetPos.x > 5) {
-      this.cameraTargetPos.setX(5);
+    if (this.cameraTargetPos.x > 7) {
+      this.cameraTargetPos.setX(7);
     }
     if (this.cameraTargetPos.x < -0.5) {
       this.cameraTargetPos.setX(-0.5);
