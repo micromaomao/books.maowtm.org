@@ -236,9 +236,32 @@ export const getBookList = () => ({
       author: "Dale Carnegie",
       url: "https://www.goodreads.com/book/show/4865.How_to_Win_Friends_and_Influence_People",
       description: `
-        <p>A guide to being nice, I guess.
+        <p>This is basically a guide to being nice, I guess.
 
-        <p>(Actually I did enjoy this)
+        <p>Lots of good points but I would be very careful on following some of
+        the advices in this day and age. Also quite long-winded/repetitive,
+        contains various strange / illogical metaphors and unrealistic / absurd
+        stories.
+
+        <p>There is one about the Colorado fuel company strike (1914), in which the
+        author said:
+
+        <blockquote>[The Rockefeller speech] presented facts in such a friendly
+        manner that the strikers went back to work without saying another word
+        about the increase in wages for which they had fought so
+        violently.</blockquote>
+
+        <p>To me this is not at all a fair representation of what happened. To
+        contrast, here is Wikipedia says:
+
+        <blockquote>The United Mine Workers of America finally ran out of money,
+        and called off the strike on December 10, 1914. In the end, the
+        strikers' demands were not met, the union did not obtain recognition,
+        and many striking workers were replaced. 408 strikers were arrested, 332
+        of whom were indicted for murder.</blockquote>
+
+        <p>This casts doubt on the accuracy of the other quite absurd stories in
+        this book.
       `
     }),
   ],
